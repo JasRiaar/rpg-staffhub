@@ -3,398 +3,761 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Riaar Pharmacy Group · Staff Hub</title>
+
+<title>Riaar Pharmacy Group Staff Hub</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#080c14;--surface:#111827;--surface2:#1a2235;--surface3:#212d44;--border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.14);--text:#e2e8f0;--muted:#64748b;--muted2:#94a3b8;--green:#22c55e;--red:#ef4444;--amber:#f59e0b;--blue:#3b82f6;--accent:#4ade80;--r:14px;--rs:9px}
-body{font-family:Outfit,sans-serif;background:#080c14;color:var(--text);min-height:100vh}
-.header{position:sticky;top:0;z-index:10;background:rgba(8,12,20,.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);height:72px;padding:0 28px;display:flex;align-items:center;justify-content:space-between}
-.logo-img{height:52px;width:auto;display:block}
-.clock{font-family:"JetBrains Mono";color:var(--accent);font-size:13px;border:1px solid rgba(34,197,94,.25);padding:6px 14px;border-radius:20px}
-.page{max-width:980px;margin:0 auto;padding:32px 22px}
-.hero{text-align:center;margin-bottom:24px}
-.big{font-family:"JetBrains Mono";font-size:68px;line-height:1}
-.date{color:var(--muted2);font-size:14px}
-.hero-logo{max-width:340px;width:80%;display:block;margin:18px auto 0;opacity:.95}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:26px;margin-bottom:22px}
-.eye{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
-h1,h2,h3{color:var(--text);margin-bottom:14px}
-.sub{color:var(--muted2);font-size:13px;margin-bottom:18px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.field{margin-bottom:15px}
-label{display:block;font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted2);margin-bottom:7px}
-select,input{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--rs);padding:13px 15px;color:var(--text);font-size:15px;font-family:Outfit}
-select:focus,input:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(34,197,94,.12)}
-button{width:100%;border:0;border-radius:var(--rs);padding:14px 18px;font-family:Outfit;font-weight:800;font-size:15px;cursor:pointer}
-.btn-green{background:linear-gradient(135deg,var(--green),#16a34a);color:#001}
-.btn-red{background:linear-gradient(135deg,var(--red),#dc2626);color:white}
-.btn-amber{background:linear-gradient(135deg,var(--amber),#d97706);color:#111}
-.btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border2)}
-.btn-sm{padding:10px 14px;font-size:13px;width:auto}
-.status{margin-top:16px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:13px;color:var(--muted2);font-size:13px}
-.success{color:var(--green);border-color:rgba(34,197,94,.25);background:rgba(34,197,94,.08)}
-.error{color:var(--red);border-color:rgba(239,68,68,.25);background:rgba(239,68,68,.08)}
-.loading{color:var(--blue);border-color:rgba(59,130,246,.25);background:rgba(59,130,246,.08)}
-.divider{display:flex;align-items:center;gap:14px;margin:34px 0 20px;color:var(--muted);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1px}
-.divider:before,.divider:after{content:"";flex:1;height:1px;background:var(--border)}
-.hidden{display:none!important}
-.pin{max-width:340px;margin:0 auto;text-align:center}
-.dots{display:flex;justify-content:center;gap:10px;margin:18px 0}
-.dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--border2)}
-.dot.filled{background:var(--accent);border-color:var(--accent)}
-.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.key{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:18px 10px;font-size:20px;font-weight:800;cursor:pointer}
-.key.ok{color:var(--accent)}
-.dash-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-end;flex-wrap:wrap;margin-bottom:18px}
-.actions{display:flex;gap:10px;flex-wrap:wrap}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
-.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px}
-.num{font-family:"JetBrains Mono";font-size:32px;color:var(--accent)}
-.lab{font-size:12px;color:var(--muted2)}
-.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:18px;overflow:auto}
-.tab{background:none;color:var(--muted2);border-radius:0;border-bottom:2px solid transparent;width:auto}
-.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
-.panel{display:none}.panel.active{display:block}
-.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
-.filters select,.filters input{width:auto;min-width:150px;padding:9px 12px;font-size:13px}
-.table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--rs)}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th{background:var(--surface2);color:var(--muted2);font-size:10px;letter-spacing:1px;text-transform:uppercase;text-align:left;padding:11px}
-td{border-top:1px solid var(--border);padding:11px;vertical-align:middle}
-.mono{font-family:"JetBrains Mono";color:var(--muted2);font-size:12px}
-.pill{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:800;text-transform:uppercase}
-.in{background:rgba(34,197,94,.1);color:var(--green);border:1px solid rgba(34,197,94,.25)}
-.out{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.25)}
-.branch{display:inline-block;background:rgba(59,130,246,.1);color:var(--blue);border:1px solid rgba(59,130,246,.25);border-radius:6px;padding:2px 8px;font-size:11px}
-.toast{position:fixed;right:24px;bottom:24px;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:14px 18px;box-shadow:0 10px 50px #000;transform:translateY(100px);transition:.3s;z-index:99}
-.toast.show{transform:translateY(0)}
-@media(max-width:700px){.grid2,.stats{grid-template-columns:1fr}.big{font-size:48px}.header{padding:0 16px}.logo-img{height:42px}.filters select,.filters input{width:100%}}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+:root{
+  --bg:#071225;
+  --card:#0d1b33;
+  --card2:#132442;
+  --border:#243655;
+  --text:#ffffff;
+  --muted:#9ba9c4;
+  --green:#22c55e;
+  --red:#ef4444;
+  --blue:#3b82f6;
+}
+
+body{
+  font-family:'Outfit',sans-serif;
+  background:linear-gradient(180deg,#071225 0%,#08101f 100%);
+  color:var(--text);
+  min-height:100vh;
+  padding:24px;
+}
+
+.container{
+  max-width:1200px;
+  margin:auto;
+}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:24px;
+}
+
+.logo{
+  height:70px;
+}
+
+.manager-btn{
+  background:#132442;
+  border:1px solid #27426d;
+  color:white;
+  padding:12px 18px;
+  border-radius:12px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.manager-btn:hover{
+  background:#193157;
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:28px;
+  padding:36px;
+}
+
+.eye{
+  color:#4ade80;
+  font-size:14px;
+  letter-spacing:2px;
+  font-weight:700;
+  margin-bottom:12px;
+}
+
+h1{
+  font-size:64px;
+  margin-bottom:30px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:24px;
+}
+
+.field{
+  margin-bottom:22px;
+}
+
+.field label{
+  display:block;
+  margin-bottom:10px;
+  font-size:14px;
+  font-weight:700;
+  color:#b6c2d9;
+  letter-spacing:1px;
+}
+
+input,select,textarea{
+  width:100%;
+  padding:24px;
+  border-radius:18px;
+  border:1px solid #32486d;
+  background:#15233f;
+  color:white;
+  font-size:22px;
+  font-family:'Outfit',sans-serif;
+}
+
+textarea{
+  resize:none;
+  height:90px;
+}
+
+.btns{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:24px;
+  margin-top:24px;
+}
+
+.btn{
+  border:none;
+  border-radius:22px;
+  padding:28px;
+  font-size:34px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.green{
+  background:linear-gradient(90deg,#22c55e,#16a34a);
+  color:black;
+}
+
+.red{
+  background:linear-gradient(90deg,#ef4444,#dc2626);
+  color:white;
+}
+
+.status{
+  margin-top:26px;
+  background:#15233f;
+  border:1px solid #32486d;
+  border-radius:18px;
+  padding:24px;
+  font-size:20px;
+  color:#d5dfef;
+}
+
+.hidden{
+  display:none;
+}
+
+.manager-panel{
+  margin-top:40px;
+}
+
+.small-title{
+  font-size:32px;
+  margin-bottom:20px;
+}
+
+.keypad{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  max-width:320px;
+  margin:auto;
+}
+
+.key{
+  background:#1a2c4d;
+  border:1px solid #38527e;
+  border-radius:16px;
+  padding:20px;
+  text-align:center;
+  font-size:28px;
+  cursor:pointer;
+}
+
+.key:hover{
+  background:#213965;
+}
+
+.dots{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  margin-bottom:24px;
+}
+
+.dot{
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  border:2px solid #38527e;
+}
+
+.dot.fill{
+  background:#4ade80;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:20px;
+}
+
+th,td{
+  padding:14px;
+  border-bottom:1px solid #243655;
+  text-align:left;
+}
+
+th{
+  color:#a8b6cf;
+}
+
+.note-btn{
+  background:#2563eb;
+  border:none;
+  color:white;
+  padding:8px 14px;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+.logout{
+  margin-top:20px;
+  background:#1f2937;
+  color:white;
+  border:none;
+  padding:12px 18px;
+  border-radius:12px;
+  cursor:pointer;
+}
+
+.pin-change{
+  margin-top:40px;
+  background:#12203a;
+  border:1px solid #2d456a;
+  border-radius:20px;
+  padding:24px;
+}
+
+.pin-change h3{
+  margin-bottom:16px;
+}
+
+.pin-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr auto;
+  gap:12px;
+}
+
+.save-pin{
+  background:#22c55e;
+  border:none;
+  color:black;
+  font-weight:700;
+  border-radius:14px;
+  padding:0 24px;
+  cursor:pointer;
+}
+
+@media(max-width:900px){
+
+  h1{
+    font-size:42px;
+  }
+
+  .grid{
+    grid-template-columns:1fr;
+  }
+
+  .btns{
+    grid-template-columns:1fr;
+  }
+
+  .btn{
+    font-size:28px;
+  }
+
+}
+
 </style>
 </head>
 
 <body>
-<header class="header">
-  <img src="logo.png" class="logo-img">
-  <div class="clock" id="headerClock">--:--:--</div>
-</header>
 
-<div class="page">
-  <div class="hero">
-    <div class="big" id="bigClock">--:--</div>
-    <div class="date" id="bigDate">--</div>
-    <img src="logo.png" class="hero-logo">
-  </div>
+<div class="container">
 
-  <div class="card">
-    <div class="eye">Staff Clock-In / Clock-Out</div>
-    <h2>Who are you?</h2>
+<div class="topbar">
 
-    <div class="grid2">
-      <div class="field">
-        <label>Staff Member</label>
-        <select id="staffSelect"><option>Loading staff…</option></select>
-      </div>
-      <div class="field">
-        <label>PIN</label>
-        <input id="pinInput" type="password" placeholder="Enter your PIN" autocomplete="off">
-      </div>
-    </div>
+<img src="logo.png" class="logo">
 
-    <div class="field">
-      <label>Reason / Note optional</label>
-      <input id="reasonInput" placeholder="Late arrival / early finish reason">
-    </div>
+<button class="manager-btn" onclick="openManager()">
+🔒 Manager
+</button>
 
-    <div class="grid2">
-      <button class="btn-green" onclick="clockIn()">▶ Clock In</button>
-      <button class="btn-red" onclick="clockOut()">⏹ Clock Out</button>
-    </div>
-
-    <div class="status" id="status">Loading...</div>
-  </div>
-
-  <div class="divider">Manager Access</div>
-
-  <div class="card" id="loginCard">
-    <div class="pin">
-      <div style="font-size:36px">🔐</div>
-      <div class="eye">Back Office</div>
-      <h2>Manager Dashboard</h2>
-      <p class="sub">Enter manager PIN to view attendance and change staff PINs.</p>
-
-      <div class="dots">
-        <div class="dot" id="pd0"></div><div class="dot" id="pd1"></div><div class="dot" id="pd2"></div><div class="dot" id="pd3"></div>
-      </div>
-
-      <div class="keypad">
-        <div class="key" onclick="pinKey('1')">1</div><div class="key" onclick="pinKey('2')">2</div><div class="key" onclick="pinKey('3')">3</div>
-        <div class="key" onclick="pinKey('4')">4</div><div class="key" onclick="pinKey('5')">5</div><div class="key" onclick="pinKey('6')">6</div>
-        <div class="key" onclick="pinKey('7')">7</div><div class="key" onclick="pinKey('8')">8</div><div class="key" onclick="pinKey('9')">9</div>
-        <div class="key" onclick="pinKey('del')">⌫</div><div class="key" onclick="pinKey('0')">0</div><div class="key ok" onclick="pinKey('ok')">OK</div>
-      </div>
-    </div>
-  </div>
-
-  <div id="dashboard" class="hidden">
-    <div class="dash-head">
-      <div>
-        <div class="eye">Back Office</div>
-        <h2>Attendance Dashboard</h2>
-        <div class="sub" id="dashDate">--</div>
-      </div>
-      <div class="actions">
-        <button class="btn-ghost btn-sm" onclick="loadAttendance()">↻ Refresh</button>
-        <button class="btn-amber btn-sm" onclick="exportCSV()">📥 Export CSV</button>
-        <button class="btn-ghost btn-sm" onclick="logout()">Log Out</button>
-      </div>
-    </div>
-
-    <div class="stats">
-      <div class="stat"><div class="num" id="sTotal">0</div><div class="lab">Records Today</div></div>
-      <div class="stat"><div class="num" id="sIn">0</div><div class="lab">Clock Ins</div></div>
-      <div class="stat"><div class="num" id="sOut">0</div><div class="lab">Clock Outs</div></div>
-      <div class="stat"><div class="num" id="sStaff">0</div><div class="lab">Active Staff Today</div></div>
-    </div>
-
-    <div class="tabs">
-      <button class="tab active" onclick="switchTab('records',this)">📊 Attendance</button>
-      <button class="tab" onclick="switchTab('staff',this)">👥 Staff / PINs</button>
-    </div>
-
-    <div class="panel active" id="panel-records">
-      <div class="filters">
-        <select id="fStaff" onchange="renderAttendance()"><option value="">All Staff</option></select>
-        <select id="fType" onchange="renderAttendance()"><option value="">All Types</option><option value="clock_in">Clock In</option><option value="clock_out">Clock Out</option></select>
-        <input type="date" id="fDate" onchange="renderAttendance()">
-        <select id="fBranch" onchange="renderAttendance()"><option value="">All Branches</option></select>
-      </div>
-
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Date/Time</th><th>Staff</th><th>Role</th><th>Type</th><th>Reason</th><th>Branch</th></tr></thead>
-          <tbody id="attBody"></tbody>
-        </table>
-      </div>
-      <div class="sub" id="recordCount" style="text-align:right;margin-top:10px"></div>
-    </div>
-
-    <div class="panel" id="panel-staff">
-      <div class="card">
-        <h3>Change Staff PIN</h3>
-        <div class="grid2">
-          <div class="field">
-            <label>Staff Member</label>
-            <select id="pinStaff"></select>
-          </div>
-          <div class="field">
-            <label>New 4 Digit PIN</label>
-            <input id="newPin" maxlength="4" inputmode="numeric" placeholder="e.g. 4821">
-          </div>
-        </div>
-        <button class="btn-green" onclick="changePin()">Update PIN</button>
-        <div class="status" id="pinStatus">Only managers can change PINs from this section.</div>
-      </div>
-
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Staff Member</th><th>Role</th><th>Branch</th><th>Records</th><th>Last Seen</th></tr></thead>
-          <tbody id="staffBody"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="card">
+
+<div class="eye">STAFF CLOCK-IN / CLOCK-OUT</div>
+
+<h1>Who are you?</h1>
+
+<div class="grid">
+
+<div class="field">
+<label>STAFF MEMBER</label>
+<select id="staffSelect"></select>
+</div>
+
+<div class="field">
+<label>PIN</label>
+<input type="password" id="pinInput" placeholder="Enter your PIN">
+</div>
+
+</div>
+
+<div class="field">
+<label>REASON / NOTE OPTIONAL</label>
+<textarea id="reasonInput" placeholder="Late arrival / early finish reason"></textarea>
+</div>
+
+<div class="btns">
+
+<button class="btn green" onclick="clockIn()">
+▶ Clock In
+</button>
+
+<button class="btn red" onclick="clockOut()">
+■ Clock Out
+</button>
+
+</div>
+
+<div class="status" id="status">
+Ready — select your name and enter your PIN
+</div>
+
+</div>
+
+<div id="managerArea" class="hidden manager-panel">
+
+<div class="card">
+
+<div id="managerLogin">
+
+<div class="small-title">
+Manager Access
+</div>
+
+<div class="dots">
+<div class="dot" id="d0"></div>
+<div class="dot" id="d1"></div>
+<div class="dot" id="d2"></div>
+<div class="dot" id="d3"></div>
+</div>
+
+<div class="keypad">
+
+<div class="key" onclick="pressPin('1')">1</div>
+<div class="key" onclick="pressPin('2')">2</div>
+<div class="key" onclick="pressPin('3')">3</div>
+
+<div class="key" onclick="pressPin('4')">4</div>
+<div class="key" onclick="pressPin('5')">5</div>
+<div class="key" onclick="pressPin('6')">6</div>
+
+<div class="key" onclick="pressPin('7')">7</div>
+<div class="key" onclick="pressPin('8')">8</div>
+<div class="key" onclick="pressPin('9')">9</div>
+
+<div class="key" onclick="pressPin('del')">⌫</div>
+<div class="key" onclick="pressPin('0')">0</div>
+<div class="key" onclick="pressPin('ok')">OK</div>
+
+</div>
+
+</div>
+
+<div id="dashboard" class="hidden">
+
+<div class="small-title">
+Attendance Dashboard
+</div>
+
+<table>
+
+<thead>
+<tr>
+<th>Time</th>
+<th>Staff</th>
+<th>Type</th>
+<th>Reason</th>
+<th>Manager Note</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody id="recordsBody"></tbody>
+
+</table>
+
+<div class="pin-change">
+
+<h3>Change Staff PIN</h3>
+
+<div class="pin-grid">
+
+<select id="pinStaff"></select>
+
+<input type="text" id="newPin" placeholder="New PIN">
+
+<button class="save-pin" onclick="changePin()">
+Save
+</button>
+
+</div>
+
+</div>
+
+<button class="logout" onclick="logoutManager()">
+Log Out
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
 
 <script>
-const SUPABASE_URL="https://mpwnqvktljeqetfrlcgy.supabase.co";
-const SUPABASE_KEY="sb_publishable_qhK08NotN0dxj13ymiOgWw_tEbopdwx";
-const MANAGER_PIN="1234";
-const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-let staffList=[];
-let records=[];
-let pinEntry="";
+const SUPABASE_URL = "https://mpwnqvktljeqetfrlcgy.supabase.co";
+const SUPABASE_KEY = "sb_publishable_qhK08NotN0dxj13ymiOgWw_tEbopdwx";
 
-function tick(){
- const n=new Date();
- headerClock.textContent=n.toLocaleTimeString("en-GB");
- bigClock.textContent=n.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"});
- bigDate.textContent=n.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
-}
-setInterval(tick,1000);tick();
+const db = supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-function setStatus(msg,type=""){status.className="status "+type;status.textContent=msg}
-function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),3000)}
+const MANAGER_PIN = "1234";
+
+let staff = [];
+let pinEntry = "";
 
 async function loadStaff(){
- setStatus("Loading staff...","loading");
- const {data,error}=await db.from("staff").select("*").order("name");
- if(error){setStatus("Staff load error: "+error.message,"error");return}
- staffList=data||[];
 
- staffSelect.innerHTML='<option value="">— Select staff member —</option>';
- pinStaff.innerHTML='<option value="">— Select staff member —</option>';
- fStaff.innerHTML='<option value="">All Staff</option>';
+  const {data,error} = await db
+  .from("staff")
+  .select("*")
+  .order("name");
 
- staffList.forEach(s=>{
-   staffSelect.innerHTML+=`<option value="${s.id}">${s.name} · ${s.role||""} · ${s.branch||""}</option>`;
-   pinStaff.innerHTML+=`<option value="${s.id}">${s.name}</option>`;
-   fStaff.innerHTML+=`<option value="${s.name}">${s.name}</option>`;
- });
+  if(error){
+    setStatus(error.message);
+    return;
+  }
 
- setStatus(staffList.length? "Ready — select your name and enter PIN" : "No staff found",""); 
- renderStaffTable();
+  staff = data || [];
+
+  const sel = document.getElementById("staffSelect");
+  const pinSel = document.getElementById("pinStaff");
+
+  sel.innerHTML = `<option value="">Select Staff</option>`;
+  pinSel.innerHTML = ``;
+
+  staff.forEach(s=>{
+
+    sel.innerHTML += `
+      <option value="${s.id}">
+        ${s.name} • ${s.role} • ${s.branch}
+      </option>
+    `;
+
+    pinSel.innerHTML += `
+      <option value="${s.id}">
+        ${s.name}
+      </option>
+    `;
+
+  });
+
+  setStatus("Ready — select your name and enter your PIN");
+
 }
 
-function selectedStaff(){
- const id=staffSelect.value;
- return staffList.find(s=>String(s.id)===String(id));
+function setStatus(text){
+  document.getElementById("status").innerText = text;
 }
 
-function validatePin(){
- const s=selectedStaff();
- if(!s){setStatus("Select your name first","error");return null}
- if(!pinInput.value){setStatus("Enter your PIN","error");return null}
- if(pinInput.value!==s.pin){setStatus("Incorrect PIN","error");return null}
- return s;
+function getStaff(){
+
+  const id = document.getElementById("staffSelect").value;
+  return staff.find(x=>String(x.id)===String(id));
+
+}
+
+function validPin(){
+
+  const s = getStaff();
+  const pin = document.getElementById("pinInput").value;
+
+  if(!s){
+    setStatus("Select your name");
+    return null;
+  }
+
+  if(pin !== s.pin){
+    setStatus("Incorrect PIN");
+    return null;
+  }
+
+  return s;
+
+}
+
+async function alreadyClocked(staffId){
+
+  const today = new Date().toISOString().split("T")[0];
+
+  const {data} = await db
+  .from("attendance")
+  .select("*")
+  .eq("staff_id",staffId)
+  .gte("clock_time",today)
+  .order("clock_time",{ascending:false})
+  .limit(1);
+
+  return data?.[0] || null;
+
 }
 
 async function clockIn(){
- const s=validatePin(); if(!s)return;
- setStatus("Recording clock in...","loading");
- const {error}=await db.from("attendance").insert({staff_id:s.id,type:"clock_in",reason:reasonInput.value||null,branch:s.branch});
- if(error){setStatus("Error: "+error.message,"error");return}
- pinInput.value="";reasonInput.value="";
- setStatus("✓ "+s.name+" clocked in","success");toast("✅ "+s.name+" clocked in");
+
+  const s = validPin();
+  if(!s) return;
+
+  const last = await alreadyClocked(s.id);
+
+  if(last && last.type === "clock_in"){
+    setStatus("You are already clocked in");
+    return;
+  }
+
+  const {error} = await db
+  .from("attendance")
+  .insert({
+    staff_id:s.id,
+    type:"clock_in",
+    reason:document.getElementById("reasonInput").value,
+    branch:s.branch
+  });
+
+  if(error){
+    setStatus(error.message);
+    return;
+  }
+
+  setStatus(`Clocked in successfully — ${s.name}`);
+
 }
 
 async function clockOut(){
- const s=validatePin(); if(!s)return;
- setStatus("Recording clock out...","loading");
- const {error}=await db.from("attendance").insert({staff_id:s.id,type:"clock_out",reason:reasonInput.value||null,branch:s.branch});
- if(error){setStatus("Error: "+error.message,"error");return}
- pinInput.value="";reasonInput.value="";
- setStatus("✓ "+s.name+" clocked out","success");toast("👋 "+s.name+" clocked out");
+
+  const s = validPin();
+  if(!s) return;
+
+  const last = await alreadyClocked(s.id);
+
+  if(!last || last.type === "clock_out"){
+    setStatus("You are not currently clocked in");
+    return;
+  }
+
+  const {error} = await db
+  .from("attendance")
+  .insert({
+    staff_id:s.id,
+    type:"clock_out",
+    reason:document.getElementById("reasonInput").value,
+    branch:s.branch
+  });
+
+  if(error){
+    setStatus(error.message);
+    return;
+  }
+
+  setStatus(`Clocked out successfully — ${s.name}`);
+
 }
 
-function pinKey(k){
- if(k==="del")pinEntry=pinEntry.slice(0,-1);
- else if(k==="ok"){login();return}
- else if(pinEntry.length<4){pinEntry+=k;if(pinEntry.length===4){login();return}}
- refreshDots();
-}
-function refreshDots(){for(let i=0;i<4;i++)document.getElementById("pd"+i).classList.toggle("filled",i<pinEntry.length)}
-function login(){
- if(pinEntry===MANAGER_PIN){
-   loginCard.classList.add("hidden");dashboard.classList.remove("hidden");
-   dashDate.textContent=new Date().toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
-   pinEntry="";refreshDots();loadAttendance();
- }else{pinEntry="";refreshDots();toast("❌ Incorrect manager PIN")}
-}
-function logout(){dashboard.classList.add("hidden");loginCard.classList.remove("hidden");pinEntry="";refreshDots()}
-
-async function loadAttendance(){
- const {data,error}=await db.from("attendance").select("*, staff(name,role,branch)").order("clock_time",{ascending:false}).limit(500);
- if(error){toast("Attendance error: "+error.message);return}
- records=data||[];
- populateBranchFilter();
- renderAttendance();
- renderStaffTable();
- renderStats();
+function openManager(){
+  document.getElementById("managerArea").classList.remove("hidden");
 }
 
-function populateBranchFilter(){
- const branches=[...new Set([...staffList.map(s=>s.branch),...records.map(r=>r.branch)].filter(Boolean))].sort();
- fBranch.innerHTML='<option value="">All Branches</option>'+branches.map(b=>`<option value="${b}">${b}</option>`).join("");
+function logoutManager(){
+
+  document.getElementById("dashboard").classList.add("hidden");
+  document.getElementById("managerLogin").classList.remove("hidden");
+  document.getElementById("managerArea").classList.add("hidden");
+
+  pinEntry = "";
+  refreshDots();
+
 }
 
-function renderAttendance(){
- let rows=[...records];
- if(fStaff.value)rows=rows.filter(r=>r.staff?.name===fStaff.value);
- if(fType.value)rows=rows.filter(r=>r.type===fType.value);
- if(fBranch.value)rows=rows.filter(r=>(r.branch||r.staff?.branch)===fBranch.value);
- if(fDate.value)rows=rows.filter(r=>new Date(r.clock_time).toISOString().split("T")[0]===fDate.value);
+function pressPin(v){
 
- attBody.innerHTML=rows.map(r=>{
-   const d=new Date(r.clock_time);
-   const isIn=r.type==="clock_in";
-   return `<tr>
-    <td><span class="mono">${d.toLocaleDateString("en-GB")}</span><br><span class="mono">${d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})}</span></td>
-    <td><strong>${r.staff?.name||"—"}</strong></td>
-    <td>${r.staff?.role||"—"}</td>
-    <td><span class="pill ${isIn?"in":"out"}">${isIn?"Clock In":"Clock Out"}</span></td>
-    <td>${r.reason||"—"}</td>
-    <td>${r.branch?`<span class="branch">${r.branch}</span>`:"—"}</td>
-   </tr>`;
- }).join("");
- recordCount.textContent=`Showing ${rows.length} record${rows.length!==1?"s":""}`;
+  if(v==="del"){
+    pinEntry = pinEntry.slice(0,-1);
+  }
+  else if(v==="ok"){
+    loginManager();
+    return;
+  }
+  else{
+    if(pinEntry.length<4){
+      pinEntry += v;
+    }
+  }
+
+  refreshDots();
+
+  if(pinEntry.length===4){
+    loginManager();
+  }
+
 }
 
-function renderStaffTable(){
- staffBody.innerHTML=staffList.map(s=>{
-   const sr=records.filter(r=>String(r.staff_id)===String(s.id));
-   const last=sr[0]?new Date(sr[0].clock_time):null;
-   return `<tr>
-    <td><strong>${s.name}</strong></td>
-    <td>${s.role||"—"}</td>
-    <td>${s.branch?`<span class="branch">${s.branch}</span>`:"—"}</td>
-    <td>${sr.length}</td>
-    <td class="mono">${last?last.toLocaleDateString("en-GB")+" "+last.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}):"—"}</td>
-   </tr>`;
- }).join("");
+function refreshDots(){
+
+  for(let i=0;i<4;i++){
+
+    document
+    .getElementById("d"+i)
+    .classList.toggle("fill",i<pinEntry.length);
+
+  }
+
 }
 
-function renderStats(){
- const today=new Date().toISOString().split("T")[0];
- const t=records.filter(r=>new Date(r.clock_time).toISOString().split("T")[0]===today);
- sTotal.textContent=t.length;
- sIn.textContent=t.filter(r=>r.type==="clock_in").length;
- sOut.textContent=t.filter(r=>r.type==="clock_out").length;
- sStaff.textContent=new Set(t.map(r=>r.staff_id)).size;
+async function loginManager(){
+
+  if(pinEntry !== MANAGER_PIN){
+
+    pinEntry = "";
+    refreshDots();
+    return;
+
+  }
+
+  document.getElementById("managerLogin").classList.add("hidden");
+  document.getElementById("dashboard").classList.remove("hidden");
+
+  pinEntry = "";
+  refreshDots();
+
+  loadRecords();
+
+}
+
+async function loadRecords(){
+
+  const {data,error} = await db
+  .from("attendance")
+  .select("*, staff(name)")
+  .order("clock_time",{ascending:false})
+  .limit(100);
+
+  if(error) return;
+
+  const body = document.getElementById("recordsBody");
+
+  body.innerHTML = "";
+
+  data.forEach(r=>{
+
+    body.innerHTML += `
+
+      <tr>
+
+      <td>${new Date(r.clock_time).toLocaleString()}</td>
+
+      <td>${r.staff?.name || ""}</td>
+
+      <td>${r.type}</td>
+
+      <td>${r.reason || ""}</td>
+
+      <td>${r.manager_note || ""}</td>
+
+      <td>
+        <button class="note-btn" onclick="addNote(${r.id})">
+          Note
+        </button>
+      </td>
+
+      </tr>
+
+    `;
+
+  });
+
+}
+
+async function addNote(id){
+
+  const note = prompt("Manager note");
+
+  if(!note) return;
+
+  await db
+  .from("attendance")
+  .update({
+    manager_note:note,
+    corrected:true
+  })
+  .eq("id",id);
+
+  loadRecords();
+
 }
 
 async function changePin(){
- const id=pinStaff.value;
- const newPin=document.getElementById("newPin").value;
- if(!id){pinStatus.textContent="Select staff member";pinStatus.className="status error";return}
- if(!/^[0-9]{4}$/.test(newPin)){pinStatus.textContent="PIN must be exactly 4 digits";pinStatus.className="status error";return}
 
- const {error}=await db.from("staff").update({pin:newPin}).eq("id",id);
- if(error){pinStatus.textContent="Error: "+error.message;pinStatus.className="status error";return}
- document.getElementById("newPin").value="";
- pinStatus.textContent="PIN updated successfully";
- pinStatus.className="status success";
- toast("✅ PIN updated");
- loadStaff();
-}
+  const id = document.getElementById("pinStaff").value;
+  const pin = document.getElementById("newPin").value;
 
-function switchTab(id,el){
- document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
- document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
- document.getElementById("panel-"+id).classList.add("active");
- el.classList.add("active");
-}
+  if(!pin) return;
 
-function exportCSV(){
- const headers=["Date","Time","Staff","Role","Type","Reason","Branch"];
- const rows=records.map(r=>{
-   const d=new Date(r.clock_time);
-   return [d.toLocaleDateString("en-GB"),d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}),r.staff?.name||"",r.staff?.role||"",r.type||"",r.reason||"",r.branch||""];
- });
- const csv=[headers,...rows].map(row=>row.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
- const blob=new Blob([csv],{type:"text/csv"});
- const url=URL.createObjectURL(blob);
- const a=document.createElement("a");
- a.href=url;a.download="riaar_attendance.csv";a.click();
- URL.revokeObjectURL(url);
+  await db
+  .from("staff")
+  .update({
+    pin:pin
+  })
+  .eq("id",id);
+
+  alert("PIN updated");
+
 }
 
 loadStaff();
+
 </script>
+
 </body>
 </html>
