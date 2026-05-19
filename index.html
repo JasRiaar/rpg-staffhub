@@ -138,15 +138,32 @@
   >
 
   <div class="row">
-    <button onclick="clockIn()">Clock In</button>
-    <button class="out" onclick="clockOut()">Clock Out</button>
-  </div>
 
-  <div class="status" id="status">
-    Ready
-  </div>
+  <button class="ghost" onclick="loadAttendance()">
+    Refresh Records
+  </button>
+
+  <button onclick="exportCSV()">
+    Export CSV
+  </button>
+
+  <button class="out" onclick="managerLogout()">
+    Log Out
+  </button>
 
 </div>
+  
+  function managerLogout(){
+
+  document.getElementById("managerPanel")
+    .classList.add("hidden");
+
+  document.getElementById("managerLogin")
+    .classList.remove("hidden");
+
+  document.getElementById("managerPin").value = "";
+
+}
 
 <div class="box">
 
