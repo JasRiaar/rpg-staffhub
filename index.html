@@ -2,11 +2,13 @@
 <html>
 <head>
   <title>Riaar Pharmacy Group Staff Hub</title>
+
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
+
     body{
       margin:0;
       padding:25px;
@@ -76,7 +78,9 @@
       padding:14px;
       border-radius:10px;
     }
+
   </style>
+
 </head>
 
 <body>
@@ -90,9 +94,13 @@
   </div>
 
   <label>Staff Member</label>
-  <select id="staffSelect"></select>
+
+  <select id="staffSelect">
+    <option>Loading...</option>
+  </select>
 
   <label>PIN</label>
+
   <input
     id="pinInput"
     type="password"
@@ -100,6 +108,7 @@
   >
 
   <label>Reason (optional)</label>
+
   <input
     id="reasonInput"
     placeholder="Late arrival / early leave reason"
@@ -114,18 +123,21 @@
   </button>
 
   <div class="status" id="status">
-    Loading staff...
+    Connecting...
   </div>
 
 </div>
 
 <script>
 
-const SUPABASE_URL = "https://mpwnqvktljeqetfrlcgy.supabase.co";
+const SUPABASE_URL =
+"https://mpwnqvktljeqetfrlcgy.supabase.co";
 
-const SUPABASE_KEY = "sb_publishable_qhK08NotN0dxj13ymiOgWw_tEbopdwx";
+const SUPABASE_KEY =
+"sb_publishable_qhK08NotN0dxj13ymiOgWw_tEbopdwx";
 
-const db = supabase.createClient(
+const db =
+supabase.createClient(
   SUPABASE_URL,
   SUPABASE_KEY
 );
@@ -134,15 +146,18 @@ let staff = [];
 
 async function loadStaff(){
 
+  document.getElementById("status").innerText =
+    "Loading staff...";
+
   const { data, error } = await db
     .from("staff")
-    .select("*")
-    .eq("branch","Yew Tree")
-    .order("name");
+    .select("*");
 
   if(error){
+
     document.getElementById("status").innerText =
-      error.message;
+      "ERROR: " + error.message;
+
     return;
   }
 
@@ -152,6 +167,17 @@ async function loadStaff(){
     document.getElementById("staffSelect");
 
   select.innerHTML = "";
+
+  if(data.length === 0){
+
+    select.innerHTML =
+      "<option>No staff found</option>";
+
+    document.getElementById("status").innerText =
+      "No staff found in database";
+
+    return;
+  }
 
   data.forEach(s => {
 
@@ -191,12 +217,16 @@ function validatePin(){
     document.getElementById("pinInput").value;
 
   if(!s){
-    alert("Select a staff member");
+
+    alert("Select staff member");
+
     return null;
   }
 
   if(pin !== s.pin){
+
     alert("Incorrect PIN");
+
     return null;
   }
 
@@ -223,7 +253,9 @@ async function clockIn(){
     });
 
   if(error){
+
     alert(error.message);
+
     return;
   }
 
@@ -251,7 +283,9 @@ async function clockOut(){
     });
 
   if(error){
+
     alert(error.message);
+
     return;
   }
 
