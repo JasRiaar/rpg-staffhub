@@ -6,221 +6,81 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    body{
-      margin:0;
-      padding:20px;
-      background:#0f172a;
-      color:white;
-      font-family:Arial;
-    }
-
-    .box{
-      max-width:900px;
-      margin:auto;
-      background:#1e293b;
-      padding:24px;
-      border-radius:18px;
-      margin-bottom:20px;
-    }
-
-    h1,h2{
-      color:#4ade80;
-      margin-top:0;
-    }
-
-    label{
-      display:block;
-      margin-top:14px;
-      margin-bottom:6px;
-      color:#cbd5e1;
-    }
-
-    select,input,button{
-      width:100%;
-      padding:13px;
-      border:none;
-      border-radius:10px;
-      font-size:15px;
-      box-sizing:border-box;
-    }
-
-    select,input{
-      background:#334155;
-      color:white;
-    }
-
-    button{
-      background:#22c55e;
-      color:black;
-      font-weight:bold;
-      cursor:pointer;
-      margin-top:14px;
-    }
-
-    .out{
-      background:#ef4444;
-      color:white;
-    }
-
-    .ghost{
-      background:#334155;
-      color:white;
-    }
-
-    .status{
-      margin-top:18px;
-      background:#0f172a;
-      color:#cbd5e1;
-      padding:14px;
-      border-radius:10px;
-    }
-
-    table{
-      width:100%;
-      border-collapse:collapse;
-      margin-top:15px;
-      font-size:14px;
-    }
-
-    th,td{
-      border-bottom:1px solid #334155;
-      padding:10px;
-      text-align:left;
-    }
-
-    th{
-      color:#94a3b8;
-    }
-
-    .hidden{
-      display:none;
-    }
-
-    .row{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
-    }
-
-    @media(max-width:700px){
-      .row{
-        grid-template-columns:1fr;
-      }
-    }
+    body{margin:0;padding:20px;background:#0f172a;color:white;font-family:Arial}
+    .box{max-width:900px;margin:auto;background:#1e293b;padding:24px;border-radius:18px;margin-bottom:20px}
+    h1,h2,h3{color:#4ade80;margin-top:0}
+    label{display:block;margin-top:14px;margin-bottom:6px;color:#cbd5e1}
+    select,input,button{width:100%;padding:13px;border:none;border-radius:10px;font-size:15px;box-sizing:border-box}
+    select,input{background:#334155;color:white}
+    button{background:#22c55e;color:black;font-weight:bold;cursor:pointer;margin-top:14px}
+    .out{background:#ef4444;color:white}
+    .ghost{background:#334155;color:white}
+    .status{margin-top:18px;background:#0f172a;color:#cbd5e1;padding:14px;border-radius:10px}
+    table{width:100%;border-collapse:collapse;margin-top:15px;font-size:14px}
+    th,td{border-bottom:1px solid #334155;padding:10px;text-align:left}
+    th{color:#94a3b8}
+    .hidden{display:none}
+    .row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+    @media(max-width:700px){.row{grid-template-columns:1fr}}
   </style>
 </head>
 
 <body>
 
 <div class="box">
-
   <h1>Riaar Pharmacy Group</h1>
-
   <p>Staff Hub</p>
 
   <label>Staff Member</label>
-
   <select id="staffSelect"></select>
 
   <label>PIN</label>
-
-  <input
-    id="pinInput"
-    type="password"
-    placeholder="Enter PIN"
-  >
+  <input id="pinInput" type="password" placeholder="Enter PIN">
 
   <label>Reason (optional)</label>
-
-  <input
-    id="reasonInput"
-    placeholder="Late arrival / early leave reason"
-  >
+  <input id="reasonInput" placeholder="Late arrival / early leave reason">
 
   <div class="row">
+    <button onclick="clockIn()">Clock In</button>
+    <button class="out" onclick="clockOut()">Clock Out</button>
+    <button class="ghost" onclick="clearStaffForm()">Clear</button>
+  </div>
 
-  <button class="ghost" onclick="loadAttendance()">
-    Refresh Records
-  </button>
-
-  <button onclick="exportCSV()">
-    Export CSV
-  </button>
-
-  <button class="out" onclick="managerLogout()">
-    Log Out
-  </button>
-
+  <div class="status" id="status">Loading staff...</div>
 </div>
-  
-  function managerLogout(){
-
-  document.getElementById("managerPanel")
-    .classList.add("hidden");
-
-  document.getElementById("managerLogin")
-    .classList.remove("hidden");
-
-  document.getElementById("managerPin").value = "";
-
-}
 
 <div class="box">
-
   <h2>Manager Dashboard</h2>
 
   <div id="managerLogin">
-
     <label>Manager PIN</label>
+    <input id="managerPin" type="password" placeholder="Enter manager PIN">
 
-    <input
-      id="managerPin"
-      type="password"
-      placeholder="Enter manager PIN"
-    >
-
-    <button onclick="managerLogin()">
-      Open Dashboard
-    </button>
-
+    <button onclick="managerLogin()">Open Dashboard</button>
   </div>
 
   <div id="managerPanel" class="hidden">
-
     <div class="row">
-      <button class="ghost" onclick="loadAttendance()">
-        Refresh Records
-      </button>
-
-      <button onclick="exportCSV()">
-        Export CSV
-      </button>
+      <button class="ghost" onclick="loadAttendance()">Refresh Records</button>
+      <button onclick="exportCSV()">Export CSV</button>
+      <button class="out" onclick="managerLogout()">Log Out</button>
     </div>
 
-    <div class="status" id="managerStatus">
-      Dashboard ready
-    </div>
+    <div class="status" id="managerStatus">Dashboard ready</div>
 
     <h3>Change Staff PIN</h3>
 
     <label>Staff Member</label>
-
     <select id="pinStaff"></select>
 
     <label>New 4 Digit PIN</label>
+    <input id="newPin" maxlength="4" placeholder="e.g. 4821">
 
-    <input
-      id="newPin"
-      maxlength="4"
-      placeholder="e.g. 4821"
-    >
+    <button onclick="changePin()">Update PIN</button>
 
-    <button onclick="changePin()">
-      Update PIN
-    </button>
+    <h3 style="margin-top:30px;">Recent Attendance</h3>
 
     <table>
-
       <thead>
         <tr>
           <th>Time</th>
@@ -230,103 +90,69 @@
           <th>Branch</th>
         </tr>
       </thead>
-
       <tbody id="attendanceBody"></tbody>
-
     </table>
-
   </div>
-
 </div>
 
 <script>
-
-const SUPABASE_URL =
-"https://mpwnqvktljeqetfrlcgy.supabase.co";
-
-const SUPABASE_KEY =
-"sb_publishable_qhK08NotN0dxj13ymiOgWw_tEbopdwx";
-
+const SUPABASE_URL = "https://mpwnqvktljeqetfrlcgy.supabase.co";
+const SUPABASE_KEY = "sb_publishable_qhK08NotN0dxj13ymiOgWw_tEbopdwx";
 const MANAGER_PIN = "1234";
 
-const db =
-supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let staff = [];
 let attendanceRows = [];
 
 async function loadStaff(){
-
   const { data, error } = await db
     .from("staff")
     .select("*")
     .order("name");
 
   if(error){
-
-    document.getElementById("status").innerText =
-      error.message;
-
+    document.getElementById("status").innerText = "ERROR: " + error.message;
     return;
   }
 
   staff = data || [];
 
-  const select =
-    document.getElementById("staffSelect");
+  const staffSelect = document.getElementById("staffSelect");
+  const pinStaff = document.getElementById("pinStaff");
 
-  const pinSelect =
-    document.getElementById("pinStaff");
+  staffSelect.innerHTML = "";
+  pinStaff.innerHTML = "";
 
-  select.innerHTML = "";
-  pinSelect.innerHTML = "";
+  if(staff.length === 0){
+    staffSelect.innerHTML = "<option>No staff found</option>";
+    document.getElementById("status").innerText = "No staff found";
+    return;
+  }
 
   staff.forEach(s => {
-
-    const opt =
-      document.createElement("option");
-
+    const opt = document.createElement("option");
     opt.value = s.id;
+    opt.textContent = s.name + " - " + s.role;
+    staffSelect.appendChild(opt);
 
-    opt.textContent =
-      s.name + " - " + s.role;
-
-    select.appendChild(opt);
-
-    const opt2 =
-      document.createElement("option");
-
+    const opt2 = document.createElement("option");
     opt2.value = s.id;
-
-    opt2.textContent =
-      s.name;
-
-    pinSelect.appendChild(opt2);
-
+    opt2.textContent = s.name;
+    pinStaff.appendChild(opt2);
   });
 
+  document.getElementById("status").innerText = "Ready";
 }
 
 function selectedStaff(){
-
-  const id =
-    document.getElementById("staffSelect").value;
-
-  return staff.find(
-    s => String(s.id) === String(id)
-  );
-
+  const id = document.getElementById("staffSelect").value;
+  return staff.find(s => String(s.id) === String(id));
 }
 
 function validatePin(){
-
   const s = selectedStaff();
-
-  const pin =
-    document.getElementById("pinInput").value;
+  const pin = document.getElementById("pinInput").value;
 
   if(!s){
     alert("Select staff member");
@@ -339,114 +165,99 @@ function validatePin(){
   }
 
   return s;
-
 }
 
 async function clockIn(){
-
   const s = validatePin();
-
   if(!s) return;
 
-  const reason =
-    document.getElementById("reasonInput").value;
+  const reason = document.getElementById("reasonInput").value;
 
-  const { error } = await db
-    .from("attendance")
-    .insert({
-      staff_id:s.id,
-      type:"clock_in",
-      reason:reason,
-      branch:s.branch
-    });
+  const { error } = await db.from("attendance").insert({
+    staff_id: s.id,
+    type: "clock_in",
+    reason: reason,
+    branch: s.branch
+  });
 
   if(error){
     alert(error.message);
     return;
   }
 
-  document.getElementById("status").innerText =
-    s.name + " clocked in";
-
+  document.getElementById("status").innerText = s.name + " clocked in";
+  clearStaffForm();
 }
 
 async function clockOut(){
-
   const s = validatePin();
-
   if(!s) return;
 
-  const reason =
-    document.getElementById("reasonInput").value;
+  const reason = document.getElementById("reasonInput").value;
 
-  const { error } = await db
-    .from("attendance")
-    .insert({
-      staff_id:s.id,
-      type:"clock_out",
-      reason:reason,
-      branch:s.branch
-    });
+  const { error } = await db.from("attendance").insert({
+    staff_id: s.id,
+    type: "clock_out",
+    reason: reason,
+    branch: s.branch
+  });
 
   if(error){
     alert(error.message);
     return;
   }
 
-  document.getElementById("status").innerText =
-    s.name + " clocked out";
+  document.getElementById("status").innerText = s.name + " clocked out";
+  clearStaffForm();
+}
 
+function clearStaffForm(){
+  document.getElementById("pinInput").value = "";
+  document.getElementById("reasonInput").value = "";
 }
 
 function managerLogin(){
-
-  const pin =
-    document.getElementById("managerPin").value;
+  const pin = document.getElementById("managerPin").value;
 
   if(pin !== MANAGER_PIN){
-
     alert("Incorrect manager PIN");
-
     return;
   }
 
-  document.getElementById("managerLogin")
-    .classList.add("hidden");
-
-  document.getElementById("managerPanel")
-    .classList.remove("hidden");
+  document.getElementById("managerLogin").classList.add("hidden");
+  document.getElementById("managerPanel").classList.remove("hidden");
 
   loadAttendance();
+}
 
+function managerLogout(){
+  document.getElementById("managerPanel").classList.add("hidden");
+  document.getElementById("managerLogin").classList.remove("hidden");
+  document.getElementById("managerPin").value = "";
+  document.getElementById("managerStatus").innerText = "Dashboard logged out";
 }
 
 async function loadAttendance(){
+  document.getElementById("managerStatus").innerText = "Loading records...";
 
   const { data, error } = await db
     .from("attendance")
     .select("*, staff(name)")
-    .order("clock_time",{ascending:false})
+    .order("clock_time", { ascending:false })
     .limit(100);
 
   if(error){
-
-    document.getElementById("managerStatus")
-      .innerText = error.message;
-
+    document.getElementById("managerStatus").innerText = "ERROR: " + error.message;
     return;
   }
 
   attendanceRows = data || [];
 
-  const body =
-    document.getElementById("attendanceBody");
-
+  const body = document.getElementById("attendanceBody");
   body.innerHTML = "";
 
   attendanceRows.forEach(r => {
-
-    const tr =
-      document.createElement("tr");
+    const tr = document.createElement("tr");
 
     tr.innerHTML = `
       <td>${new Date(r.clock_time).toLocaleString("en-GB")}</td>
@@ -457,95 +268,63 @@ async function loadAttendance(){
     `;
 
     body.appendChild(tr);
-
   });
 
+  document.getElementById("managerStatus").innerText =
+    attendanceRows.length + " records loaded";
 }
 
 async function changePin(){
+  const id = document.getElementById("pinStaff").value;
+  const newPin = document.getElementById("newPin").value;
 
-  const id =
-    document.getElementById("pinStaff").value;
-
-  const newPin =
-    document.getElementById("newPin").value;
-
-  if(newPin.length !== 4){
-
-    alert("PIN must be 4 digits");
-
+  if(!/^[0-9]{4}$/.test(newPin)){
+    alert("PIN must be exactly 4 digits");
     return;
   }
 
   const { error } = await db
     .from("staff")
-    .update({ pin:newPin })
-    .eq("id",id);
+    .update({ pin: newPin })
+    .eq("id", id);
 
   if(error){
-
     alert(error.message);
-
     return;
   }
 
   alert("PIN updated successfully");
-
   document.getElementById("newPin").value = "";
-
   loadStaff();
-
 }
 
 function exportCSV(){
+  const headers = ["Time","Staff","Type","Reason","Branch"];
 
-  const headers =
-    ["Time","Staff","Type","Reason","Branch"];
+  const rows = attendanceRows.map(r => [
+    new Date(r.clock_time).toLocaleString("en-GB"),
+    r.staff?.name || "",
+    r.type,
+    r.reason || "",
+    r.branch || ""
+  ]);
 
-  const rows =
-    attendanceRows.map(r => [
+  const csv = [headers, ...rows]
+    .map(row => row.map(v => `"${String(v).replace(/"/g,'""')}"`).join(","))
+    .join("\n");
 
-      new Date(r.clock_time)
-        .toLocaleString("en-GB"),
+  const blob = new Blob([csv], { type:"text/csv" });
+  const url = URL.createObjectURL(blob);
 
-      r.staff?.name || "",
-
-      r.type,
-
-      r.reason || "",
-
-      r.branch || ""
-
-    ]);
-
-  const csv =
-    [headers,...rows]
-      .map(r =>
-        r.map(x =>
-          `"${String(x).replace(/"/g,'""')}"`
-        ).join(",")
-      ).join("\n");
-
-  const blob =
-    new Blob([csv],{type:"text/csv"});
-
-  const url =
-    URL.createObjectURL(blob);
-
-  const a =
-    document.createElement("a");
-
+  const a = document.createElement("a");
   a.href = url;
-
-  a.download =
-    "riaar_attendance.csv";
-
+  a.download = "riaar_attendance.csv";
   a.click();
 
+  URL.revokeObjectURL(url);
 }
 
 loadStaff();
-
 </script>
 
 </body>
