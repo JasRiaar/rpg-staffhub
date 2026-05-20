@@ -429,20 +429,89 @@ async function loadLeaveRequests(){
 }
 
 async function approveLeave(id,staffId,hours){
+ const request = await db
+  .from("leave_requests")
+  .select("*")
+  .eq("id",id)
+  .single();
+
+ if(request.error){
+  alert(request.error.message);
+  return;
+ }
+
+ if(request.data.status !== "pending"){
+  alert("This leave request has already been processed.");
+  return;
+ }
+
  const note=prompt("Manager note optional")||"";
+
  const s=staff.find(x=>String(x.id)===String(staffId));
  const used=Number(s?.annual_leave_used_hours||0)+Number(hours);
- const e1=await db.from("leave_requests").update({status:"approved",manager_note:note}).eq("id",id);
- if(e1.error){alert(e1.error.message);return}
- const e2=await db.from("staff").update({annual_leave_used_hours:used}).eq("id",staffId);
- if(e2.error){alert(e2.error.message);return}
+
+ const e1=await db
+  .from("leave_requests")
+  .update({
+    status:"approved",
+    manager_note:note
+  })
+  .eq("id",id)
+  .eq("status","pending");
+
+ if(e1.error){
+  alert(e1.error.message);
+  return;
+ }
+
+ const e2=await db
+  .from("staff")
+  .update({
+    annual_leave_used_hours:used
+  })
+  .eq("id",staffId);
+
+ if(e2.error){
+  alert(e2.error.message);
+  return;
+ }
+
  refreshManager();
 }
 
 async function declineLeave(id){
+ const request = await db
+  .from("leave_requests")
+  .select("*")
+  .eq("id",id)
+  .single();
+
+ if(request.error){
+  alert(request.error.message);
+  return;
+ }
+
+ if(request.data.status !== "pending"){
+  alert("This leave request has already been processed.");
+  return;
+ }
+
  const note=prompt("Reason / manager note optional")||"";
- const {error}=await db.from("leave_requests").update({status:"declined",manager_note:note}).eq("id",id);
- if(error){alert(error.message);return}
+
+ const {error}=await db
+  .from("leave_requests")
+  .update({
+    status:"declined",
+    manager_note:note
+  })
+  .eq("id",id)
+  .eq("status","pending");
+
+ if(error){
+  alert(error.message);
+  return;
+ }
+
  loadLeaveRequests();
 }
 
