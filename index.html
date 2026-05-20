@@ -6,20 +6,22 @@
 <title>Riaar Pharmacy Group Staff Hub</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#071225;--card:#0d1b33;--card2:#132442;--border:#2c4166;--text:#fff;--muted:#9ba9c4;--green:#22c55e;--red:#ef4444;--blue:#3b82f6;--amber:#f59e0b}
 body{font-family:Outfit,sans-serif;background:linear-gradient(180deg,#071225,#08101f);color:var(--text);min-height:100vh;padding:24px}
 .container{max-width:1200px;margin:auto}
 .hidden{display:none!important}
-.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
-.logo{height:70px}
+.logo{height:74px}
 .card{background:var(--card);border:1px solid var(--border);border-radius:28px;padding:36px;margin-bottom:28px}
-.landing{text-align:center;max-width:760px;margin:80px auto}
-.branch-card{background:#132442;border:1px solid #27426d;border-radius:28px;padding:36px;cursor:pointer;margin-top:30px}
+.landing{text-align:center;max-width:820px;margin:60px auto}
+.branch-card{background:#132442;border:1px solid #27426d;border-radius:28px;padding:34px;cursor:pointer;margin-top:22px}
 .branch-card:hover{border-color:#22c55e}
+.coming{opacity:.55;cursor:not-allowed}
 .eye{color:#4ade80;font-size:14px;letter-spacing:2px;font-weight:800;margin-bottom:12px}
-h1{font-size:62px;margin-bottom:24px}h2{font-size:32px;margin-bottom:20px}h3{margin-bottom:16px}
+h1{font-size:58px;margin-bottom:24px}h2{font-size:32px;margin-bottom:20px}h3{margin-bottom:16px}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
 .clockbox{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center;margin-bottom:22px}
 .time{font-size:54px;font-weight:800}.date{color:var(--muted);font-size:20px}
 .birthday{background:#132442;border:1px solid #27426d;border-radius:18px;padding:18px;font-size:18px;color:#fcd34d}
@@ -43,20 +45,31 @@ table{width:100%;border-collapse:collapse;margin-top:20px}th,td{padding:12px;bor
 .tabs{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0}
 .tab{background:#132442;border:1px solid #27426d;color:#fff;padding:12px 16px;border-radius:12px;cursor:pointer}
 .tab.active{background:#22c55e;color:#000}
-@media(max-width:900px){h1{font-size:42px}.grid,.grid3,.btns,.clockbox{grid-template-columns:1fr}.logo{height:54px}}
+@media(max-width:900px){h1{font-size:40px}.grid,.grid3,.btns,.clockbox{grid-template-columns:1fr}.logo{height:54px}}
 </style>
 </head>
-<body>
 
+<body>
 <div class="container">
 
 <div id="landingPage" class="landing">
   <img src="logo.png" class="logo" style="height:95px">
   <h1 style="font-size:44px;margin-top:30px">Riaar Pharmacy Group</h1>
-  <p style="color:#9ba9c4;font-size:20px">Select your branch</p>
+  <p style="color:#9ba9c4;font-size:20px">Select your area</p>
+
   <div class="branch-card" onclick="openBranch('Yew Tree Pharmacy')">
     <h2>Yew Tree Pharmacy</h2>
     <p style="color:#9ba9c4">Open Staff Hub</p>
+  </div>
+
+  <div class="branch-card coming" onclick="comingSoon()">
+    <h2>Wards Chemist</h2>
+    <p style="color:#9ba9c4">Coming Soon</p>
+  </div>
+
+  <div class="branch-card" onclick="openPayroll()">
+    <h2>Back Office / Payroll</h2>
+    <p style="color:#9ba9c4">Payroll-only access</p>
   </div>
 </div>
 
@@ -176,6 +189,52 @@ table{width:100%;border-collapse:collapse;margin-top:20px}th,td{padding:12px;bor
 </div>
 
 </div>
+
+<div id="payrollPage" class="hidden">
+<div class="topbar">
+  <img src="logo.png" class="logo">
+  <button class="manager-btn" onclick="backToLanding()">← Back</button>
+</div>
+
+<div class="card" id="payrollLogin">
+  <h2>Back Office / Payroll</h2>
+  <p style="color:#9ba9c4;margin-bottom:20px">Payroll-only access</p>
+  <div class="field"><label>Payroll PIN</label><input type="password" id="payrollPin" placeholder="Enter payroll PIN"></div>
+  <button class="btn blue" onclick="loginPayroll()">Open Payroll Dashboard</button>
+  <div class="status" id="payrollStatus">Enter payroll PIN to continue.</div>
+</div>
+
+<div class="card hidden" id="payrollDash">
+  <h2>Payroll Dashboard</h2>
+  <button class="logout" onclick="logoutPayroll()">Log Out</button>
+  <button class="logout" onclick="loadPayrollData()">Refresh</button>
+  <button class="logout" onclick="exportPayrollCSV()">Export Attendance CSV</button>
+
+  <div class="grid" style="margin-top:20px">
+    <div class="field"><label>Staff Filter</label><select id="payrollStaffFilter" onchange="renderPayrollAttendance()"><option value="">All Staff</option></select></div>
+    <div class="field"><label>Date Filter</label><input type="date" id="payrollDateFilter" onchange="renderPayrollAttendance()"></div>
+  </div>
+
+  <h3>Attendance Records</h3>
+  <table>
+    <thead><tr><th>Time</th><th>Staff</th><th>Branch</th><th>Type</th><th>Reason</th><th>Manager Note</th><th>Corrected</th></tr></thead>
+    <tbody id="payrollAttendanceBody"></tbody>
+  </table>
+
+  <h3 style="margin-top:34px">Leave Records</h3>
+  <table>
+    <thead><tr><th>Requested</th><th>Staff</th><th>Branch</th><th>Dates</th><th>Hours</th><th>Status</th><th>Manager Note</th></tr></thead>
+    <tbody id="payrollLeaveBody"></tbody>
+  </table>
+
+  <h3 style="margin-top:34px">Leave Balances</h3>
+  <table>
+    <thead><tr><th>Staff</th><th>Branch</th><th>Allowance</th><th>Used</th><th>Left</th></tr></thead>
+    <tbody id="payrollBalanceBody"></tbody>
+  </table>
+</div>
+</div>
+
 </div>
 
 <script>
@@ -183,27 +242,40 @@ const SUPABASE_URL="https://mpwnqvktljeqetfrlcgy.supabase.co";
 const SUPABASE_KEY="sb_publishable_qhK08NotN0dxj13ymiOgWw_tEbopdwx";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const MANAGER_PIN="1234";
+const PAYROLL_PIN="2468";
 
-let staff=[],pinEntry="",currentBranch="Yew Tree Pharmacy";
+let staff=[],pinEntry="",currentBranch="Yew Tree Pharmacy",payrollAttendance=[],payrollLeave=[],payrollStaff=[];
 
 function tick(){
  const n=new Date();
- timeNow.innerText=n.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"});
- dateNow.innerText=n.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+ if(document.getElementById("timeNow")){
+  timeNow.innerText=n.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"});
+  dateNow.innerText=n.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+ }
 }
 setInterval(tick,1000);
 
 function openBranch(branch){
  currentBranch=branch;
  landingPage.classList.add("hidden");
+ payrollPage.classList.add("hidden");
  appPage.classList.remove("hidden");
  branchTitle.innerText=branch;
  tick();
  loadStaff();
 }
 
+function openPayroll(){
+ landingPage.classList.add("hidden");
+ appPage.classList.add("hidden");
+ payrollPage.classList.remove("hidden");
+}
+
+function comingSoon(){alert("Wards Chemist is coming soon.");}
+
 function backToLanding(){
  appPage.classList.add("hidden");
+ payrollPage.classList.add("hidden");
  landingPage.classList.remove("hidden");
  managerArea.classList.add("hidden");
 }
@@ -278,11 +350,14 @@ function openLeaveBox(){
  const allowance=Number(s.annual_leave_allowance_hours||0);
  const used=Number(s.annual_leave_used_hours||0);
  leaveStatus.innerText=`${s.name}: ${allowance-used} hours left (${used}/${allowance} used)`;
+ pinInput.value="";
  leaveBox.classList.remove("hidden");
 }
 
 async function submitLeave(){
- const s=validPin(); if(!s)return;
+ const staffId=staffSelect.value;
+ const s=staff.find(x=>String(x.id)===String(staffId));
+ if(!s){leaveStatus.innerText="Select staff member first";return}
  const hours=Number(leaveHours.value);
  if(!leaveFrom.value||!leaveTo.value||!hours){leaveStatus.innerText="Complete dates and hours requested";return}
  const {error}=await db.from("leave_requests").insert({
@@ -410,6 +485,105 @@ function showTab(name,btn){
  document.getElementById("tab-"+name).classList.remove("hidden");
  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
  btn.classList.add("active");
+}
+
+function loginPayroll(){
+ if(payrollPin.value!==PAYROLL_PIN){payrollStatus.innerText="Incorrect payroll PIN";return}
+ payrollLogin.classList.add("hidden");
+ payrollDash.classList.remove("hidden");
+ loadPayrollData();
+}
+
+function logoutPayroll(){
+ payrollDash.classList.add("hidden");
+ payrollLogin.classList.remove("hidden");
+ payrollPin.value="";
+ payrollStatus.innerText="Enter payroll PIN to continue.";
+}
+
+async function loadPayrollData(){
+ const sRes=await db.from("staff").select("*").order("name");
+ const aRes=await db.from("attendance").select("*, staff(name,role)").order("clock_time",{ascending:false}).limit(500);
+ const lRes=await db.from("leave_requests").select("*, staff(name,role)").order("created_at",{ascending:false}).limit(500);
+
+ if(sRes.error||aRes.error||lRes.error){alert("Payroll load error");return}
+
+ payrollStaff=sRes.data||[];
+ payrollAttendance=aRes.data||[];
+ payrollLeave=lRes.data||[];
+
+ payrollStaffFilter.innerHTML='<option value="">All Staff</option>';
+ payrollStaff.forEach(s=>payrollStaffFilter.innerHTML+=`<option value="${s.name}">${s.name}</option>`);
+
+ renderPayrollAttendance();
+ renderPayrollLeave();
+ renderPayrollBalances();
+}
+
+function renderPayrollAttendance(){
+ let rows=[...payrollAttendance];
+ if(payrollStaffFilter.value)rows=rows.filter(r=>r.staff?.name===payrollStaffFilter.value);
+ if(payrollDateFilter.value)rows=rows.filter(r=>new Date(r.clock_time).toISOString().split("T")[0]===payrollDateFilter.value);
+
+ payrollAttendanceBody.innerHTML="";
+ rows.forEach(r=>{
+  payrollAttendanceBody.innerHTML+=`<tr>
+   <td>${new Date(r.clock_time).toLocaleString("en-GB")}</td>
+   <td>${r.staff?.name||""}</td>
+   <td>${r.branch||""}</td>
+   <td>${r.type||""}</td>
+   <td>${r.reason||""}</td>
+   <td>${r.manager_note||""}</td>
+   <td>${r.corrected?"Yes":"No"}</td>
+  </tr>`;
+ });
+}
+
+function renderPayrollLeave(){
+ payrollLeaveBody.innerHTML="";
+ payrollLeave.forEach(r=>{
+  payrollLeaveBody.innerHTML+=`<tr>
+   <td>${new Date(r.created_at).toLocaleString("en-GB")}</td>
+   <td>${r.staff?.name||""}</td>
+   <td>${r.branch||""}</td>
+   <td>${r.from_date} → ${r.to_date}</td>
+   <td>${r.hours_requested||""}</td>
+   <td>${r.status||""}</td>
+   <td>${r.manager_note||""}</td>
+  </tr>`;
+ });
+}
+
+function renderPayrollBalances(){
+ payrollBalanceBody.innerHTML="";
+ payrollStaff.forEach(s=>{
+  const allowance=Number(s.annual_leave_allowance_hours||0);
+  const used=Number(s.annual_leave_used_hours||0);
+  payrollBalanceBody.innerHTML+=`<tr>
+   <td>${s.name}</td><td>${s.branch||""}</td><td>${allowance}</td><td>${used}</td><td>${allowance-used}</td>
+  </tr>`;
+ });
+}
+
+function exportPayrollCSV(){
+ const headers=["Time","Staff","Branch","Type","Reason","Manager Note","Corrected"];
+ const rows=payrollAttendance.map(r=>[
+  new Date(r.clock_time).toLocaleString("en-GB"),
+  r.staff?.name||"",
+  r.branch||"",
+  r.type||"",
+  r.reason||"",
+  r.manager_note||"",
+  r.corrected?"Yes":"No"
+ ]);
+ const csv=[headers,...rows].map(row=>row.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
+ const blob=new Blob([csv],{type:"text/csv"});
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement("a");
+ a.href=url;
+ a.download="riaar_payroll_attendance.csv";
+ a.click();
+ URL.revokeObjectURL(url);
 }
 </script>
 </body>
